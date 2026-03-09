@@ -90,27 +90,24 @@ Requirements:
 
 ## 5. Archive Structure
 
-The archive root **MUST** contain `index.md`. A `manifest.json` file at the archive root is OPTIONAL. All other files are organized relative to the archive root.
-
-`index.md` serves as the **fallback entry point** for consumers that do not support `manifest.json`. It **MUST** always be present regardless of whether a manifest `entryPoint` override is defined.
+A `.mdz` file is a ZIP archive containing at least one Markdown file that can be resolved as the primary document using the entry point discovery algorithm defined in [Section 5.5](#55-entry-point-discovery). A `manifest.json` file at the archive root is OPTIONAL. All other files are organized relative to the archive root.
 
 ### 5.1 Required Files
 
-| Path | Description |
-|------|-------------|
-| `index.md` | Fallback entry point Markdown file. Always required. |
+There are no unconditionally required files beyond the archive being a valid ZIP. However, the archive **MUST** contain at least one Markdown file that satisfies the entry point discovery rules in [Section 5.5](#55-entry-point-discovery).
 
 ### 5.2 Optional Files
 
 | Path | Description |
 |------|-------------|
+| `index.md` | Conventional entry point Markdown file (see [Section 5.5](#55-entry-point-discovery)). |
 | `manifest.json` | Optional document manifest (see [Section 6](#6-manifest-file)). |
 
 ### 5.3 Recommended Layout
 
 ```
 document.mdz (ZIP archive)
-├── index.md               # Required: default entry point Markdown file
+├── index.md               # Recommended: conventional entry point
 ├── manifest.json          # Optional: metadata and entry-point override
 ├── chapter-01.md          # Additional Markdown files (optional)
 ├── chapter-02.md
@@ -131,18 +128,16 @@ document.mdz (ZIP archive)
 - File paths **MUST NOT** contain characters reserved by common operating systems: `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`.
 - File paths **SHOULD** use lowercase characters.
 
-### 5.5 Fallback Behavior of `index.md`
+### 5.5 Entry Point Discovery
 
-When `manifest.json` is present and `entryPoint` refers to a file other than `index.md`, conforming producers **SHOULD** ensure `index.md` contains a human-readable reference or link to the actual entry-point document. This allows consumers that do not support `manifest.json` to still present meaningful content to users.
+Conforming consumers **MUST** determine the primary Markdown file using the following ordered algorithm:
 
-**Example `index.md` stub:**
-```markdown
-# My Document
+1. If `manifest.json` is present at the archive root and contains a valid `entryPoint` value referencing an existing file in the archive, use that file.
+2. If `index.md` exists at the archive root, use it.
+3. If exactly one `.md` or `.markdown` file exists at the archive root, use it.
+4. Otherwise, the consumer **MUST NOT** silently select a file arbitrarily. The consumer **SHOULD** present the user with a list of available Markdown files to choose from, or report a clear error indicating that no unambiguous entry point could be determined.
 
-This document requires an MDZ-compatible reader for the best experience.
-
-→ [Continue to the document](chapters/intro.md)
-```
+Conforming producers **SHOULD** ensure their archives satisfy one of the first three conditions to guarantee unambiguous entry point resolution across all consumers. Including `index.md` at the archive root or providing a `manifest.json` with `entryPoint` defined are the most interoperable approaches.
 
 ---
 
@@ -182,7 +177,7 @@ The manifest file, when present, **MUST** be named `manifest.json` and placed at
 |-------|------|----------|-------------|
 | `mdz` | string | **REQUIRED (if manifest is present)** | The version of this specification the file conforms to. **MUST** be a [Semantic Versioning 2.0.0](https://semver.org/) string (e.g., `"1.0.0"`). |
 | `title` | string | **REQUIRED (if manifest is present)** | The human-readable title of the document. **MUST NOT** be empty. |
-| `entryPoint` | string | OPTIONAL | Archive-root-relative path to the primary Markdown file (e.g., `"chapters/start.md"`). The referenced file **MUST** exist in the archive. If omitted, consumers **MUST** use `index.md`. |
+| `entryPoint` | string | OPTIONAL | Path to the primary Markdown file, relative to the archive root (e.g., `"chapters/start.md"`). The referenced file **MUST** exist in the archive. If omitted, consumers apply the entry point discovery algorithm defined in [Section 5.5](#55-entry-point-discovery). |
 | `language` | string | OPTIONAL | The natural language of the document as a [BCP 47](https://www.rfc-editor.org/rfc/rfc5646) language tag (e.g., `"en"`, `"fr-CA"`). Defaults to `"en"` if omitted. |
 | `authors` | array | OPTIONAL | An array of author objects. Each object **MAY** include `name` (string) and `email` (string) fields. |
 | `description` | string | OPTIONAL | A short plain-text description of the document. |
@@ -334,7 +329,7 @@ This section summarizes expected behavior that improves interoperability across 
 
 ### 12.1 Baseline Interoperability
 
-- Conforming consumers **MUST** support archives that omit `manifest.json` and use `index.md` as the primary document.
+- Conforming consumers **MUST** implement the entry point discovery algorithm defined in [Section 5.5](#55-entry-point-discovery).
 - Conforming consumers **MUST** support UTF-8 encoded Markdown and JSON files.
 - Conforming consumers **MUST** support relative path resolution semantics defined in [Section 9](#9-linking-and-references).
 
@@ -387,9 +382,9 @@ Conforming consumers and producers should treat `.mdz` content as potentially un
 A conforming producer is any software that creates `.mdz` files. A conforming producer:
 
 1. **MUST** produce a valid ZIP archive as defined in [Section 4](#4-file-format).
-2. **MUST** include `index.md` at the archive root.
-3. **MUST** include the file referenced by `entryPoint` when a manifest is present and defines `entryPoint`.
-4. **SHOULD** ensure `index.md` contains a human-readable reference or link to the actual entry-point document when `entryPoint` refers to a file other than `index.md` (see [Section 5.5](#55-fallback-behavior-of-indexmd)).
+2. **MUST** ensure the archive satisfies at least one of the first three conditions of the entry point discovery algorithm defined in [Section 5.5](#55-entry-point-discovery).
+3. **SHOULD** include `index.md` at the archive root or provide a `manifest.json` with `entryPoint` defined, as these are the most broadly compatible approaches.
+4. **MUST** include the file referenced by `entryPoint` when a manifest is present and defines `entryPoint`.
 5. **MUST** use UTF-8 encoding for all Markdown and JSON files.
 6. **SHOULD** write LF (`\n`) line endings for all text files in the archive.
 7. **MUST** use forward-slash path separators in the archive.
@@ -402,9 +397,9 @@ A conforming producer is any software that creates `.mdz` files. A conforming pr
 A conforming consumer is any software that reads and/or renders `.mdz` files. A conforming consumer:
 
 1. **MUST** be able to open and extract a valid ZIP archive.
-2. **MUST** use `index.md` as the primary Markdown file when no manifest is present.
-3. **MUST** parse `manifest.json` when present and use `entryPoint` as the primary Markdown file when defined.
-4. **MUST** ignore unrecognized fields in `manifest.json`.
+2. **MUST** determine the primary Markdown file using the entry point discovery algorithm defined in [Section 5.5](#55-entry-point-discovery).
+3. **MUST NOT** silently select a Markdown file arbitrarily when no unambiguous entry point can be determined. The consumer **SHOULD** present the user with a list of available Markdown files or report a clear error.
+4. **MUST** parse `manifest.json` when present and ignore unrecognized fields.
 5. **MUST** resolve asset and document links relative to the referencing file's location within the archive.
 6. **MUST** reject or safely handle any path that traverses outside the archive root.
 7. **MUST** accept text files that use LF (`\n`) or CRLF (`\r\n`) line endings.
@@ -416,7 +411,7 @@ A conforming consumer is any software that reads and/or renders `.mdz` files. A 
 
 ### 15.1 Minimal `.mdz` Archive
 
-A valid minimal `.mdz` archive contains only `index.md`:
+A valid minimal `.mdz` archive contains a single Markdown file at the archive root. Naming it `index.md` is the recommended convention:
 
 **Archive contents:**
 ```

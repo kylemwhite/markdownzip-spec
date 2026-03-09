@@ -1,4 +1,4 @@
-# markdownzip-spec
+# Markdown Zip Specification
 
 Specification for the **Markdown Zip** (`.mdz`) file format.
 

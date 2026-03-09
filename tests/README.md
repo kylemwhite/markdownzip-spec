@@ -8,7 +8,7 @@ Conformance test catalog for `.mdz` producers and consumers.
 |----|------|-------|-----------------|
 | `T-001` | Minimal valid package | `examples/minimal/` | Consumer opens `index.md` as primary document. |
 | `T-002` | Valid package with manifest | `examples/with-manifest/` | Consumer uses `manifest.json.entryPoint`. |
-| `T-003` | Missing required root `index.md` | `examples/invalid/missing-index/` | Consumer rejects as non-conforming. |
+| `T-003` | No resolvable entry point | `examples/invalid/missing-index/` | Consumer rejects as non-conforming because no entry point can be resolved by Section 5.5. |
 | `T-004` | Manifest points to missing file | `examples/invalid/bad-entrypoint/` | Consumer rejects as non-conforming. |
 | `T-005` | CRLF text file handling | `examples/line-endings-crlf/` | Consumer accepts and reads document. |
 

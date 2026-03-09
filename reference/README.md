@@ -93,3 +93,17 @@ The prohibited characters (`\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`) are the union
 - **Linux (ext4 and most filesystems)** — prohibits `/` and null bytes
 
 The spec restricts the intersection that causes cross-platform failures. Forward slash (`/`) is already handled by the path separator rules. The remaining list ensures that a conforming archive can be safely extracted on any platform without name collisions or filesystem errors.
+
+---
+
+## Why a dedicated consumer is required for correct asset rendering
+
+A `.mdz` file is only fully portable when opened by a tool that understands it is operating inside an archive. This is most visible with assets such as images.
+
+When a Markdown file inside an archive references an image with a relative path — e.g., `![Diagram](assets/images/diagram.svg)` — a conforming consumer resolves that path within the archive's virtual filesystem, finds the entry, and serves it inline during rendering. The image displays correctly.
+
+If instead the `.md` file is extracted alone and opened in a generic Markdown editor, the editor looks for `assets/images/diagram.svg` on the local filesystem relative to the file's location on disk. That path doesn't exist, and the image is broken.
+
+Extracting the entire archive first preserves the directory structure, so a generic editor may then resolve the relative paths correctly — but this defeats the portability purpose of the format and requires the user to manage extracted files manually.
+
+This is the core reason the spec defines path resolution semantics (Section 9.3) and why tooling that understands the archive context is necessary to deliver the full `.mdz` experience. The format is inspectable without a dedicated consumer; it is only fully renderable with one.

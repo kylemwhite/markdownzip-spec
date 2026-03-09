@@ -25,3 +25,6 @@ All notable changes to this project are documented in this file.
 - Added provisional MIME registration note for `application/vnd.markdownzip`.
 - Clarified `index.md` as a required fallback entry point (not merely the default), always present regardless of manifest `entryPoint`.
 - Updated Section 14.1 conforming producer requirements to include stub guidance (item 4).
+- Replaced mandatory `index.md` requirement with a four-step entry point discovery algorithm (Section 5.5). `index.md` is now the recommended convention, not a hard requirement.
+- Consumers MUST NOT silently pick an entry point when ambiguous; SHOULD present user with file list or clear error.
+- Updated Sections 5, 5.1, 5.2, 5.3, 6.2, 12.1, 14.1, 14.2, and 15.1 to reflect the new discovery model.
