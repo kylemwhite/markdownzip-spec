@@ -1,0 +1,72 @@
+[
+  {
+    "name": "default filters include markdown and images",
+    "inputPaths": [
+      "a.md",
+      "notes/todo.markdown",
+      "assets/cover.png",
+      "assets/photo.jpg",
+      "assets/style.css",
+      "notes.txt"
+    ],
+    "filters": [
+      "**/*.md",
+      "**/*.markdown",
+      "**/*.png",
+      "**/*.jpg",
+      "**/*.jpeg",
+      "**/*.gif",
+      "**/*.webp",
+      "**/*.svg",
+      "**/*.avif"
+    ],
+    "expectedIncluded": [
+      "a.md",
+      "notes/todo.markdown",
+      "assets/cover.png",
+      "assets/photo.jpg"
+    ],
+    "expectedExcluded": [
+      "assets/style.css",
+      "notes.txt"
+    ]
+  },
+  {
+    "name": "markdown only filter",
+    "inputPaths": [
+      "book/intro.md",
+      "book/ch1.md",
+      "assets/diagram.svg",
+      "assets/cover.webp"
+    ],
+    "filters": [
+      "**/*.md"
+    ],
+    "expectedIncluded": [
+      "book/intro.md",
+      "book/ch1.md"
+    ],
+    "expectedExcluded": [
+      "assets/diagram.svg",
+      "assets/cover.webp"
+    ]
+  },
+  {
+    "name": "single-level image filter",
+    "inputPaths": [
+      "cover.png",
+      "images/cover.png",
+      "images/icons/icon.png"
+    ],
+    "filters": [
+      "*.png"
+    ],
+    "expectedIncluded": [
+      "cover.png"
+    ],
+    "expectedExcluded": [
+      "images/cover.png",
+      "images/icons/icon.png"
+    ]
+  }
+]

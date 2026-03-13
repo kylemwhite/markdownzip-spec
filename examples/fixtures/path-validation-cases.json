@@ -1,0 +1,42 @@
+[
+  {
+    "name": "simple markdown path is valid",
+    "path": "index.md",
+    "valid": true
+  },
+  {
+    "name": "nested asset path is valid",
+    "path": "assets/images/cover.png",
+    "valid": true
+  },
+  {
+    "name": "leading slash is invalid",
+    "path": "/index.md",
+    "valid": false,
+    "errorCode": "ERR_PATH_LEADING_SLASH"
+  },
+  {
+    "name": "path traversal is invalid",
+    "path": "../escape.md",
+    "valid": false,
+    "errorCode": "ERR_PATH_TRAVERSAL"
+  },
+  {
+    "name": "reserved character is invalid",
+    "path": "chapter:01.md",
+    "valid": false,
+    "errorCode": "ERR_PATH_RESERVED_CHAR"
+  },
+  {
+    "name": "backslash separator is invalid",
+    "path": "assets\\cover.png",
+    "valid": false,
+    "errorCode": "ERR_PATH_RESERVED_CHAR"
+  },
+  {
+    "name": "control character is invalid",
+    "path": "bad\u0001name.md",
+    "valid": false,
+    "errorCode": "ERR_PATH_CONTROL_CHAR"
+  }
+]

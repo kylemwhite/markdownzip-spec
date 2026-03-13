@@ -1,0 +1,50 @@
+[
+  {
+    "name": "manifest entryPoint wins when present and valid",
+    "files": [
+      "index.md",
+      "start.md",
+      "manifest.json"
+    ],
+    "manifest": {
+      "entryPoint": "start.md"
+    },
+    "expectedEntryPoint": "start.md"
+  },
+  {
+    "name": "root index fallback",
+    "files": [
+      "index.md",
+      "chapter-01.md"
+    ],
+    "manifest": null,
+    "expectedEntryPoint": "index.md"
+  },
+  {
+    "name": "single root markdown fallback",
+    "files": [
+      "README.md",
+      "assets/images/cover.png"
+    ],
+    "manifest": null,
+    "expectedEntryPoint": "README.md"
+  },
+  {
+    "name": "ambiguous root markdown without index",
+    "files": [
+      "a.md",
+      "b.md"
+    ],
+    "manifest": null,
+    "expectedEntryPoint": null
+  },
+  {
+    "name": "no markdown files",
+    "files": [
+      "assets/images/cover.png",
+      "assets/style.css"
+    ],
+    "manifest": null,
+    "expectedEntryPoint": null
+  }
+]

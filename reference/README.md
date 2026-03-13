@@ -48,6 +48,8 @@ In practice, most modern Markdown tooling converges on CommonMark as a baseline.
 
 ## Why `SHOULD` for LF line endings rather than `MUST`?
 
+Conforming producers SHOULD normalize line endings to LF when writing `.mdz` files, even if source content originated from platforms that use other line-ending conventions.
+
 Requiring LF absolutely would technically invalidate archives created on Windows by tools that write CRLF natively. The intent is to push the ecosystem toward a consistent default (LF is the de facto standard for source-controlled text files) without breaking existing tooling that doesn't normalize line endings.
 
 Consumers are required (`MUST`) to accept both, so the practical interoperability impact of CRLF in an archive is zero — it just creates mild inconsistency in the raw archive contents.
